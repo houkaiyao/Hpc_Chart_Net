@@ -18,10 +18,17 @@
                            Name="DataTimePicker" HorizontalAlignment="Left" 
                            Width="120" Margin="10" ShowClearButton="True" 
                            Style="{StaticResource DatePicker.Small}" />
-            <ComboBox x:Name="ComboBox1"  Width="70" Margin="10" Text="{Binding Hour1Value}" 
-                      ItemsSource="{Binding Hours, Mode=TwoWay}" />
-            <ComboBox x:Name="ComboBox2"  Width="70" Margin="10" Text="{Binding Hour2Value}" 
-                      ItemsSource="{Binding Hours, Mode=TwoWay}" />
+            <hc:TimePicker Margin="10" Text="{Binding StartTime, Mode=TwoWay}" Style="{StaticResource TimePickerPlus}">
+                <hc:TimePicker.Clock>
+                    <hc:ListClock/>
+                </hc:TimePicker.Clock>
+            </hc:TimePicker>
+
+            <hc:TimePicker Margin="10" Text="{Binding EndTime, Mode=TwoWay}" Style="{StaticResource TimePickerPlus}">
+                <hc:TimePicker.Clock>
+                    <hc:ListClock/>
+                </hc:TimePicker.Clock>
+            </hc:TimePicker>
             <ComboBox x:Name="ComboBox3"  Width="123" Margin="10" Text="{Binding ComboBoxValue}" 
                       ItemsSource="{Binding ComboBoxSource, Mode=OneWay}" />
             <Button x:Name="SearchBtn"  Tag="SearchTag" Command="{Binding BtnClickCommand}" CommandParameter="{Binding Tag,RelativeSource={RelativeSource Self}}" Content="搜索" Style="{StaticResource ButtonWarning}"

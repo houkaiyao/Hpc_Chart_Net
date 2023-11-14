@@ -5,6 +5,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -33,6 +34,9 @@ namespace Hpc_Chart_Net
 
             PickerValue = DateTime.Now.ToString("yyyy/MM/dd");
             PlotModel = new PlotModel { Title = "HPC Chart" };
+
+            StartTime = DateTime.Now.ToString("HH:mm:00");
+            EndTime = DateTime.Now.ToString("HH:mm:00");
         }
 
         private void BtnClick(object parameter)
@@ -42,7 +46,7 @@ namespace Hpc_Chart_Net
                 switch (parameter.ToString())
                 {
                     case "SearchTag":
-                        if (ComboBoxSource.Contains(ComboBoxValue) && Hours.Contains(Hour1Value) && Hours.Contains(Hour2Value))
+                        if (ComboBoxSource.Contains(ComboBoxValue) && StartTime!=null && EndTime!=null)
                         {
                             GetDataSource();
                         }
@@ -58,10 +62,14 @@ namespace Hpc_Chart_Net
         {
             string _Path, _pickerVlaue;
             _pickerVlaue = PickerValue.Replace('/', '_');
-            int startHour = Convert.ToInt32(Hour1Value);
-            int endHour = Convert.ToInt32(Hour2Value);
+
+            DateTime startTime = DateTime.ParseExact(StartTime, "HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime endTime = DateTime.ParseExact(EndTime, "HH:mm:ss", CultureInfo.InvariantCulture);
+
+            int _startHour = Convert.ToInt32(startTime.Hour);
+            int _endHour = Convert.ToInt32(endTime.Hour);
             dataModels.Clear();
-            for (int i = startHour; i <= endHour; i++)
+            for (int i = _startHour; i <= _endHour; i++)
             {
                 _Path = string.Format(@"D:\WinPc1\Sys\Data\Data\@{0}\@{1}_{2}.log", _pickerVlaue, _pickerVlaue, i.ToString());
                 try
@@ -73,25 +81,36 @@ namespace Hpc_Chart_Net
                         while ((line = reader.ReadLine()) != null)
                         {
                             string[] dataItems = line.Split(',');
-                            DataModel dataModel = new DataModel();
-                            dataModel.dataTime = dataItems[0].Replace('/', '-');
-                            dataModel.Ch1.Arm2N2 = float.Parse(dataItems[1]);
-                            dataModel.Ch1.BSNN2 = float.Parse(dataItems[2]);
-                            dataModel.Ch1.BSRDI = float.Parse(dataItems[3]);
-                            dataModel.Ch1.Arm2DI = float.Parse(dataItems[4]);
-                            dataModel.Ch1.Arm1DI = float.Parse(dataItems[5]);
-                            dataModel.Ch1.Arm3N2 = float.Parse(dataItems[6]);
-                            dataModel.Ch1.Arm1Press = float.Parse(dataItems[7]);
+                            DateTime datetime = DateTime.ParseExact(dataItems[0], "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-                            dataModel.Ch2.Arm2N2 = float.Parse(dataItems[8]);
-                            dataModel.Ch2.BSNN2 = float.Parse(dataItems[9]);
-                            dataModel.Ch2.BSRDI = float.Parse(dataItems[10]);
-                            dataModel.Ch2.Arm2DI = float.Parse(dataItems[11]);
-                            dataModel.Ch2.Arm1DI = float.Parse(dataItems[12]);
-                            dataModel.Ch2.Arm3N2 = float.Parse(dataItems[13]);
-                            dataModel.Ch2.Arm1Press = float.Parse(dataItems[14]);
-                            dataModel.Ch1.eFlow = float.Parse(dataItems[15]);
-                            dataModels.Add(dataModel);
+                            TimeSpan timePart = datetime.TimeOfDay;
+
+                            if (timePart >= startTime.TimeOfDay && timePart <= endTime.TimeOfDay)
+                            {
+                                DataModel dataModel = new DataModel();
+                                dataModel.dataTime = dataItems[0].Replace('/', '-');
+                                dataModel.Ch1.Arm2N2 = float.Parse(dataItems[1]);
+                                dataModel.Ch1.BSNN2 = float.Parse(dataItems[2]);
+                                dataModel.Ch1.BSRDI = float.Parse(dataItems[3]);
+                                dataModel.Ch1.Arm2DI = float.Parse(dataItems[4]);
+                                dataModel.Ch1.Arm1DI = float.Parse(dataItems[5]);
+                                dataModel.Ch1.Arm3N2 = float.Parse(dataItems[6]);
+                                dataModel.Ch1.Arm1Press = float.Parse(dataItems[7]);
+
+                                dataModel.Ch2.Arm2N2 = float.Parse(dataItems[8]);
+                                dataModel.Ch2.BSNN2 = float.Parse(dataItems[9]);
+                                dataModel.Ch2.BSRDI = float.Parse(dataItems[10]);
+                                dataModel.Ch2.Arm2DI = float.Parse(dataItems[11]);
+                                dataModel.Ch2.Arm1DI = float.Parse(dataItems[12]);
+                                dataModel.Ch2.Arm3N2 = float.Parse(dataItems[13]);
+                                dataModel.Ch2.Arm1Press = float.Parse(dataItems[14]);
+                                dataModel.Ch1.eFlow = float.Parse(dataItems[15]);
+                                dataModels.Add(dataModel);
+                            }
+                            else if (timePart > endTime.TimeOfDay)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -294,10 +313,9 @@ namespace Hpc_Chart_Net
         }
 
         public string PickerValue { get; set; }
-        public string Hour1Value { get; set; }
-        public string Hour2Value { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
         public string ComboBoxValue { get; set; }
-        public List<String> Hours { get; set; } = Enumerable.Range(0, 24).Select(i => i.ToString("D1")).ToList();
 
         public List<String> ComboBoxSource { get; } = new List<string>()
         {
