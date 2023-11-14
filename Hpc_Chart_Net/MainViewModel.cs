@@ -15,6 +15,7 @@ namespace Hpc_Chart_Net
     internal class MainViewModel : ObservableObject
     {
         private PlotModel plotModel;
+        private int a;
         private DateTimeAxis xAxis;
         private LineSeries series;
         private IPlotController plotModelController;
