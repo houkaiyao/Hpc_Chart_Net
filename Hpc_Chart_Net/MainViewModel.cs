@@ -61,7 +61,7 @@ namespace Hpc_Chart_Net
         private void GetDataSource()
         {
             string _Path, _pickerVlaue;
-            _pickerVlaue = PickerValue.Replace('/', '_');
+            _pickerVlaue = RemoveLeadingZeor(PickerValue.Replace('/', '_'));
 
             DateTime startTime = DateTime.ParseExact(StartTime, "HH:mm:ss", CultureInfo.InvariantCulture);
             DateTime endTime = DateTime.ParseExact(EndTime, "HH:mm:ss", CultureInfo.InvariantCulture);
@@ -121,6 +121,16 @@ namespace Hpc_Chart_Net
                 }
             }
             RefreshSeries(ComboBoxValue);
+        }
+
+        private string RemoveLeadingZeor(string pickerValue)
+        {
+            string[] dateParts = pickerValue.Split('_');
+            int year = int.Parse(dateParts[0]);
+            int month = int.Parse(dateParts[1]);
+            int day = int.Parse(dateParts[2]);
+
+            return $"{year}_{month}_{day}";
         }
 
         private void RefreshSeries(string comboValue)
